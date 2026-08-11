@@ -87,11 +87,21 @@ filename). Import into VirtualBox via the `.ovf` file inside the extracted archi
 
 ## Phase 1 — FortiGate Clock Drift
 
-- Issue: FortiGate system clock drifted roughly one hour behind actual time. config system ntp with set ntpsync enable / set type fortiguard was configured but did not actually resync (last ntp sync timestamp remained unchanged).
+### Issue: FortiGate system clock drifted ~1 hour behind actual time
 
-  Root cause: port1/port2 are bound to isolated Host-only VMnets with no route to the internet by design (the lab's segmented network intentionally has no external access), so FortiGuard's NTP servers were unreachable — confirmed no free network path for execute ping 8.8.8.8.
+**Problem:** FortiGate's system clock had drifted roughly one hour behind actual time. 
+`config system ntp` with `set ntpsync enable` / `set type fortiguard` was configured, 
+but did not actually resync — the `last ntp sync` timestamp remained unchanged after 
+applying the setting.
 
-  Resolution: Corrected the clock manually via execute date / execute time rather than relying on NTP, since the isolated network is a deliberate design choice, not a misconfiguration to fix.
+**Root cause:** port1/port2 are bound to isolated Host-only VMnets with no route to the 
+internet by design (the lab's segmented network intentionally has no external access), 
+so FortiGuard's NTP servers were unreachable. Confirmed via `execute ping 8.8.8.8` 
+returning no response.
+
+**Resolution:** Corrected the clock manually via `execute date` / `execute time` rather 
+than relying on NTP, since the isolated network is a deliberate design choice, not a 
+misconfiguration to fix.
 
 ---
 
