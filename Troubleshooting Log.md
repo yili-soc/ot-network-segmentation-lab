@@ -103,6 +103,32 @@ returning no response.
 than relying on NTP, since the isolated network is a deliberate design choice, not a 
 misconfiguration to fix.
 
+### Issue: conpot-vm unreachable on port 502 — traced to missing default route
+
+**Problem:** After a reboot, analyst-vm could no longer reach conpot-vm on TCP/502. 
+FortiGate logs showed the SYN being forwarded cleanly, and conpot-vm's own NIC 
+confirmed receiving it (via `tcpdump`) — but no reply ever came back, not even a RST.
+
+**Root cause:** Earlier `ip addr add` / `ip route add` commands were runtime-only and 
+never persisted to netplan, so the reboot reverted both VMs' networking. conpot-vm's 
+netplan had a static IP but no default route — it could receive packets from a 
+different subnet but had no path to reply, so the kernel silently dropped the response 
+before it ever reached the TCP stack. This looks identical to a firewall drop (pure 
+timeout, no RST) but isn't one.
+
+Also found and fixed during this check: conpot-vm still had a leftover second NIC 
+bridged to the IT segment (a VirtualBox migration artifact) that would have let it 
+bypass FortiGate entirely — removed. VMnet1's DHCP service was also still enabled, 
+contradicting the static-only design — disabled.
+
+**Resolution:** Rewrote both VMs' netplan configs with persistent static IPs and 
+explicit default routes, then validated across a full reboot of both VMs (not just a 
+live test) before considering it fixed.
+
+**Takeaway:** `ip addr add`/`ip route add` don't survive a reboot — only netplan does. 
+A missing return route looks exactly like a firewall drop (timeout, no RST) unless you 
+check the route table.
+
 ---
 
 *Log will be updated as Phase 1–4 proceed.*
