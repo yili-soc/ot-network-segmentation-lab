@@ -103,6 +103,10 @@ returning no response.
 than relying on NTP, since the isolated network is a deliberate design choice, not a 
 misconfiguration to fix.
 
+---
+
+## Phase 2 — conpot-vm Unreachable on Port 502 (Missing Default Route)
+
 ### Issue: conpot-vm unreachable on port 502 — traced to missing default route
 
 **Problem:** After a reboot, analyst-vm could no longer reach conpot-vm on TCP/502. 
