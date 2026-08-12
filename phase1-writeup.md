@@ -129,3 +129,4 @@ ICMP reachability checks) denied by default.
   time sync and FortiGuard threat intelligence updates are unavailable — acceptable 
   for this lab's scope, but a real deployment would need an explicit, tightly 
   controlled path for these services.
+ 
