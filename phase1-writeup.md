@@ -74,6 +74,8 @@ ping -c 3 10.10.20.10
 3 packets transmitted, 0 received, 100% packet loss
 ```
 
+![Pre-policy ping baseline — 100% packet loss](images/phase1-ping-blocked-baseline.png)
+
 **2. Post-policy Modbus traffic (allowed).** With the policy in place, a live Modbus 
 read was issued from analyst-vm:
 
@@ -91,6 +93,8 @@ capture on FortiGate (`diagnose sniffer packet any "host 10.10.20.10 and port 50
 (psh/ack pairs), and a clean four-way connection close — confirming the traffic 
 traverses the firewall as designed rather than being incidentally permitted.
 
+![FortiGate sniffer — complete TCP handshake and Modbus request/response](images/phase1-sniffer-handshake.png)
+
 **3. Post-policy non-Modbus traffic (still denied).** With the same policy active, 
 ICMP was re-tested and remained fully blocked:
 
@@ -106,6 +110,8 @@ for the same source/destination pair, differentiated only by protocol:
 |---|---|---|---|---|---|
 | 2026/08/10 20:24:2x | 10.10.10.10 | 10.10.20.10 | PING | Deny | Implicit Deny |
 | 2026/08/10 20:1x:xx | 10.10.10.10 | 10.10.20.10 | MODBUS | Accept | Allow-Modbus-Only (1) |
+
+![Forward Traffic log — PING denied, MODBUS accepted, same source/destination](images/phase1-forward-traffic-log.png)
 
 Together, these results confirm the policy enforces access at the protocol level — 
 the OT segment is reachable only via Modbus, with all other traffic (including basic 
